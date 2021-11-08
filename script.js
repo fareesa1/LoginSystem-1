@@ -5,6 +5,7 @@ var input_title;
 var input_description;
 var x1,y1;
 var currentUserUid=""
+var postTitle=""
 
 const firebaseConfig = {
    apiKey: "AIzaSyDyqYOnUsPMdmth2HQ3cOLvq1-VoBCO6aA",
@@ -18,24 +19,9 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 db = firebase.database()
-var input_title;
-
-function addUserData(){
-    // var rand = Math.round(Math.random() * 800) + Math.round(Math.random() * 800)
-    
-    rand = currentUserUid
-    input_title = document.getElementById("input_title").value
-    input_description = document.getElementById("input_description").value
-    db.ref("posts/"+rand + "/").set({title:input_title, description:input_description, timeStamp:new Date().getTime()})
-    // console.log(input_title)
-    window.location.href = 'feed.html';
-    document.getElementById('input_title').value = ''
-    document.getElementById('input_description').value = ''
-}
 
 
 window.onload = function() {
-
   }
 
 function login(){
@@ -58,7 +44,7 @@ function registerUser(email, password) {
         console.log("User successfully created!");
          currentUserUid=cred.user.uid
         window.location.href = 'createpost.html';
-        db.ref("users/").set({email:cred.user.email,uid:cred.user.uid})
+        db.ref("users/").update({email:cred.user.email,uid:cred.user.uid})
     }).catch(err => {
     console.log(err.message);
     })
@@ -71,18 +57,46 @@ function loginUser(email, password) {
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((cred) => {
             // alert('Successfully authenticated!');
-         currentUserUid=cred.user.uid
+        currentUserUid=cred.user.uid
         db.ref("users/").update({email:cred.user.email,uid:cred.user.uid})
         console.log(cred.user.uid);
-
             window.location.href = 'createpost.html';
             // direct to logic success page
         }).catch(err => {
             console.log(err.message);
         })
-        document.getElementById('input1').value = ''
-        document.getElementById('input2').value = ''    
+         
 }
+
+
+function addUserData(){
+    var rand = Math.round(Math.random() *60) + Math.round(Math.random() * 800)
+    // rand = currentUserUid
+    input_title = document.getElementById("input_title").value
+    input_description = document.getElementById("input_description").value
+    db.ref("posts/"+rand + "/").update({title:input_title, description:input_description, timeStamp:new Date().getTime()})
+    // console.log(input_title)
+    window.location.href = 'feed.html';
+
+}
+
+function readUserData(){
+    db.ref("posts/").on("value", (data)=>{
+        var readPost = data.val()
+        console.log(readPost)
+
+var arr = Object.keys(readPost)
+console.log(arr[0])
+console.log(readPost[arr[0].toString()].title)
+postTitle = readPost[arr[2].toString()].title
+document.getElementById("post_title").innerHTML = postTitle
+
+    })
+}
+
+// function readIds(){
+
+// }
 
 
 
